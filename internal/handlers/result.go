@@ -21,7 +21,17 @@ func (h *Handler) Result(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
-	track, err := h.spotify.SearchTrack(
+	// Inicjalizacja i sprawdzenie klienta Spotify dla hosta
+	spotifyClient := h.spotifyClient()
+	if spotifyClient == nil {
+		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
+			"error": "host is not logged into spotify",
+		})
+		return
+	}
+
+	// Wyszukanie utworu za pomocą pobranego klienta
+	track, err := spotifyClient.SearchTrack(
 		ctx,
 		song,
 	)
@@ -78,7 +88,8 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
-	device, err := h.spotify.ActiveDevice(ctx)
+	// Pobranie aktywnego urządzenia za pomocą pobranego klienta
+	device, err := spotifyClient.ActiveDevice(ctx)
 
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
@@ -87,7 +98,8 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
-	err = h.spotify.AddToQueue(
+	// Dodanie do kolejki za pomocą pobranego klienta
+	err = spotifyClient.AddToQueue(
 		ctx,
 		track.ID,
 		string(device.ID),

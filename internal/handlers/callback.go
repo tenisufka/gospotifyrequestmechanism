@@ -25,36 +25,14 @@ func (h *Handler) Callback(c *gin.Context) {
 		c.Request.Context(),
 		code,
 	)
-
 	if err != nil {
-		c.HTML(
-			http.StatusInternalServerError,
-			"wrong.html",
-			gin.H{
-				"error": err.Error(),
-			},
-		)
+		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
-	// Zapis tokenu do sesji
 	h.tokenStore.Set(token)
-
-	session.Set(
-		"spotify_token",
-		token.AccessToken,
-	)
-
-	if err := session.Save(); err != nil {
-		c.HTML(
-			http.StatusInternalServerError,
-			"wrong.html",
-			gin.H{
-				"error": err.Error(),
-			},
-		)
-		return
-	}
 
 	c.Redirect(
 		http.StatusTemporaryRedirect,
