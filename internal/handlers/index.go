@@ -8,11 +8,11 @@ import (
 
 func (h *Handler) Index(c *gin.Context) {
 
-	c.HTML(
-		http.StatusOK,
-		"index.html",
-		gin.H{
-			"title": "Spotify Request Mechanism",
-		},
-	)
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"title":          "Spotify Request Mechanism",
+		"PlaybackName":   "",
+		"PlaybackArtist": "",
+		"PlaybackImage":  "",
+		"PlaybackEx":     false,
+	})
 }

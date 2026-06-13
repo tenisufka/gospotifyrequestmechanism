@@ -2,12 +2,14 @@ package spotify
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	zspotify "github.com/zmb3/spotify/v2"
 )
 
-func (c *Client) GetActiveDevice(
+var ErrNoActiveDevice = errors.New("no active spotify device")
+
+func (c *Client) ActiveDevice(
 	ctx context.Context,
 ) (*zspotify.PlayerDevice, error) {
 
@@ -24,7 +26,9 @@ func (c *Client) GetActiveDevice(
 		}
 	}
 
-	return nil, fmt.Errorf(
-		"no active device found",
-	)
+	if len(devices) > 0 {
+		return &devices[0], nil
+	}
+
+	return nil, ErrNoActiveDevice
 }

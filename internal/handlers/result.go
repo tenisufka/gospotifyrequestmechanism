@@ -4,13 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zmb3/spotify"
 
 	"spotifysrmechanism/internal/filters"
 )
 
 func (h *Handler) Result(c *gin.Context) {
+
 	song := c.PostForm("song")
+
 	if song == "" {
 		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
 			"error": "song is empty",
@@ -20,33 +21,18 @@ func (h *Handler) Result(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
-	// Spotify client (już powinien być autoryzowany middlewarem)
-	token := c.GetString("spotify_token")
-	if token == "" {
-		c.HTML(http.StatusUnauthorized, "wrong.html", gin.H{
-			"error": "missing spotify token",
-		})
-		return
-	}
+	track, err := h.spotify.SearchTrack(
+		ctx,
+		song,
+	)
 
-	// Jeśli klient NIE jest jeszcze ustawiony, tworzysz go:
-	// (jeśli masz już h.spotify globalnie - pomiń)
-	h.spotify = spotify.NewAuthenticator("", nil).NewClient(&spotify.Token{
-		AccessToken: token,
-	})
-
-	// 1. Search track
-	results, err := h.spotify.Search(song, spotify.SearchTypeTrack)
-	if err != nil || results.Tracks == nil || len(results.Tracks.Tracks) == 0 {
+	if err != nil {
 		c.HTML(http.StatusNotFound, "wrong.html", gin.H{
-			"error": "track not found",
+			"error": err.Error(),
 		})
 		return
 	}
 
-	track := results.Tracks.Tracks[0]
-
-	// 2. Validation
 	if track.Explicit {
 		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
 			"error": "explicit track",
@@ -54,7 +40,9 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
-	if track.Duration > 300000000000 { // duration in nanoseconds in zmb3/spotify
+	durationSeconds := int(track.Duration) / 1000
+
+	if durationSeconds > 300 {
 		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
 			"error": "track longer than 5 minutes",
 		})
@@ -68,9 +56,14 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
-	// 3. Lyrics (blocking call - bez goroutine, bo i tak czekasz)
 	artist := track.Artists[0].Name
-	lyricsText, err := h.lyrics.GetLyrics(ctx, artist, track.Name)
+
+	lyricsText, err := h.lyrics.GetLyrics(
+		ctx,
+		artist,
+		track.Name,
+	)
+
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "wrong.html", gin.H{
 			"error": err.Error(),
@@ -78,7 +71,6 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
-	// 4. Filter lyrics
 	if filters.ContainsBadWords(lyricsText) {
 		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
 			"error": "lyrics contain forbidden words",
@@ -86,8 +78,8 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
-	// 5. Get devices
-	devices, err := h.spotify.PlayerDevices()
+	device, err := h.spotify.ActiveDevice(ctx)
+
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
 			"error": err.Error(),
@@ -95,17 +87,12 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
-	if len(devices) == 0 {
-		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
-			"error": "no active devices",
-		})
-		return
-	}
+	err = h.spotify.AddToQueue(
+		ctx,
+		track.ID,
+		string(device.ID),
+	)
 
-	deviceID := devices[0].ID
-
-	// 6. Add to queue (IMPORTANT: spotify.URI, nie string)
-	err = h.spotify.AddToQueue(deviceID, track.URI)
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "wrong.html", gin.H{
 			"error": err.Error(),
@@ -113,7 +100,6 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
-	// 7. Success
 	c.HTML(http.StatusOK, "result.html", gin.H{
 		"track":  track.Name,
 		"lyrics": lyricsText,
