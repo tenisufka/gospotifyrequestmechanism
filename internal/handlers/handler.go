@@ -9,10 +9,11 @@ import (
 )
 
 type Handler struct {
-	cfg     *config.Config
-	spotify *spotifyapi.Client
-	lyrics  *lyrics.Client
-	oauth   *spotifyapi.OAuth
+	cfg        *config.Config
+	spotify    *spotifyapi.Client
+	lyrics     *lyrics.Client
+	oauth      *spotifyapi.OAuth
+	tokenStore *spotifyapi.TokenStore
 }
 
 func New(cfg *config.Config) *Handler {

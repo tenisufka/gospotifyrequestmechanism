@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,7 +38,7 @@ func (h *Handler) Callback(c *gin.Context) {
 	}
 
 	// Zapis tokenu do sesji
-	session := sessions.Default(c)
+	h.tokenStore.Set(token)
 
 	session.Set(
 		"spotify_token",
