@@ -21,6 +21,7 @@ func NewAuthorized(
 	token *oauth2.Token,
 	clientID string,
 	clientSecret string,
+	store *TokenStore,
 ) *Client {
 
 	cfg := oauth2.Config{
@@ -28,9 +29,25 @@ func NewAuthorized(
 		ClientSecret: clientSecret,
 	}
 
-	httpClient := cfg.Client(
+	tokenSource := cfg.TokenSource(
 		context.Background(),
 		token,
+	)
+
+	tokenSource = oauth2.ReuseTokenSource(
+		token,
+		tokenSource,
+	)
+
+	httpClient := oauth2.NewClient(
+		context.Background(),
+		oauth2.ReuseTokenSource(
+			token,
+			tokenSaver{
+				source: tokenSource,
+				store:  store,
+			},
+		),
 	)
 
 	return &Client{

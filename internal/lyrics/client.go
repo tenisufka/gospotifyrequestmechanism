@@ -28,52 +28,63 @@ func (c *Client) GetLyrics(
 ) (string, error) {
 
 	endpoint :=
-		"https://api.lyrics.ovh/v1/" +
-			url.PathEscape(artist) +
-			"/" +
-			url.PathEscape(title)
+		"https://lrclib.net/api/get" +
+			"?artist_name=" + url.QueryEscape(artist) +
+			"&track_name=" + url.QueryEscape(title)
 
-	req, err := http.NewRequestWithContext(
-		ctx,
-		http.MethodGet,
-		endpoint,
-		nil,
-	)
+	var lastErr error
 
-	if err != nil {
-		return "", err
-	}
+	for attempt := 1; attempt <= 3; attempt++ {
 
-	resp, err := c.httpClient.Do(req)
-
-	if err != nil {
-		return "", err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-
-		return "", fmt.Errorf(
-			"lyrics api returned %d",
-			resp.StatusCode,
+		req, err := http.NewRequestWithContext(
+			ctx,
+			http.MethodGet,
+			endpoint,
+			nil,
 		)
+		if err != nil {
+			return "", err
+		}
+
+		resp, err := c.httpClient.Do(req)
+		if err != nil {
+			lastErr = err
+			time.Sleep(time.Second)
+			continue
+		}
+
+		var result LyricsResponse
+
+		func() {
+			defer resp.Body.Close()
+
+			if resp.StatusCode != http.StatusOK {
+				lastErr = fmt.Errorf(
+					"lrclib returned %d",
+					resp.StatusCode,
+				)
+				return
+			}
+
+			if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+				lastErr = err
+				return
+			}
+
+			if result.PlainLyrics == "" {
+				lastErr = fmt.Errorf("lyrics not found")
+				return
+			}
+
+			lastErr = nil
+		}()
+
+		if lastErr == nil {
+			return result.PlainLyrics, nil
+		}
+
+		time.Sleep(time.Second)
 	}
 
-	var result LyricsResponse
-
-	if err := json.NewDecoder(
-		resp.Body,
-	).Decode(&result); err != nil {
-
-		return "", err
-	}
-
-	if result.Lyrics == "" {
-		return "", fmt.Errorf(
-			"lyrics not found",
-		)
-	}
-
-	return result.Lyrics, nil
+	return "", lastErr
 }

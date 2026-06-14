@@ -40,15 +40,16 @@ func main() {
 
 	// 5. Rejestracja endpointów aplikacji
 	router.GET("/", h.Index)
-	router.GET("/search", h.Search)
-	router.POST("/result", h.Result)
-
-	// Endpointy do autoryzacji Spotify OAuth2
 	router.GET("/login", h.Login)
 	router.GET("/callback", h.Callback)
-	router.GET("/logout", h.Logout)
+
+	router.GET("/search", h.Search)
+	router.POST("/search", h.SearchResults)
+
+	router.POST("/result", h.Result)
 
 	// Endpoint sprawdzania stanu aplikacji
+	router.GET("/logout", h.Logout)
 	router.GET("/health", h.Health)
 
 	// 6. Uruchomienie serwera HTTP
