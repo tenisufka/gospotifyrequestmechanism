@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 
 	"spotifysrmechanism/internal/config"
@@ -20,7 +18,6 @@ func main() {
 	}
 
 	// 2. Ładowanie pliku z zakazanymi słowami
-	// Plik powinieneś umieścić w: <root projektu>/internal/filters/badwords.txt
 	if err := filters.LoadBadWords("internal/filters/badwords.txt"); err != nil {
 		log.Fatalf("failed to load bad words: %v", err)
 	}
@@ -28,29 +25,14 @@ func main() {
 	// 3. Inicjalizacja routera Gin
 	router := gin.Default()
 
-	// Konfiguracja magazynu sesji opartego na ciasteczkach (cookies)
-	store := cookie.NewStore(
-		[]byte(cfg.SessionSecret),
-	)
-
-	// Rejestracja middleware do obsługi sesji w routerze
-	router.Use(
-		sessions.Sessions(
-			"spotify-session",
-			store,
-		),
-	)
-
 	// -----------------------------
 	// STATIC FILES
 	// -----------------------------
-	// Serwowanie plików statycznych z katalogu <root projektu>/static
 	router.Static("/static", "./static")
 
 	// -----------------------------
 	// HTML TEMPLATES
 	// -----------------------------
-	// Ładowanie szablonów HTML z katalogu <root projektu>/templates
 	router.LoadHTMLGlob("templates/*")
 
 	// 4. Tworzenie instancji handlera z przekazaną konfiguracją
@@ -61,10 +43,13 @@ func main() {
 	router.GET("/search", h.Search)
 	router.POST("/result", h.Result)
 
-	// Nowe endpointy do autoryzacji Spotify OAuth2
+	// Endpointy do autoryzacji Spotify OAuth2
 	router.GET("/login", h.Login)
 	router.GET("/callback", h.Callback)
-	router.GET("/logout", h.Logout) // Dodany endpoint wylogowania
+	router.GET("/logout", h.Logout)
+
+	// Endpoint sprawdzania stanu aplikacji
+	router.GET("/health", h.Health)
 
 	// 6. Uruchomienie serwera HTTP
 	log.Printf("Spotify Request Mechanism started on %s", cfg.ServerPort)

@@ -9,9 +9,20 @@ import (
 )
 
 func (h *Handler) Result(c *gin.Context) {
+	// Sprawdzenie połączenia z Spotify na samym początku handlera
+	spotifyClient := h.spotifyClient()
+	if spotifyClient == nil {
+		c.HTML(
+			http.StatusServiceUnavailable,
+			"wrong.html",
+			gin.H{
+				"error": "host is not connected to spotify",
+			},
+		)
+		return
+	}
 
 	song := c.PostForm("song")
-
 	if song == "" {
 		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
 			"error": "Nie podano utworu",
@@ -21,19 +32,10 @@ func (h *Handler) Result(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
-	spotifyClient := h.spotifyClient()
-	if spotifyClient == nil {
-		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
-			"error": "Host nie jest zalogowany do Spotify",
-		})
-		return
-	}
-
 	track, err := spotifyClient.SearchTrack(
 		ctx,
 		song,
 	)
-
 	if err != nil {
 		c.HTML(http.StatusNotFound, "wrong.html", gin.H{
 			"error": err.Error(),
@@ -62,7 +64,6 @@ func (h *Handler) Result(c *gin.Context) {
 	}
 
 	durationSeconds := int(track.Duration) / 1000
-
 	if durationSeconds > 300 {
 		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
 			"error":  "Utwór jest dłuższy niż 5 minut",
@@ -78,7 +79,6 @@ func (h *Handler) Result(c *gin.Context) {
 		artist,
 		track.Name,
 	)
-
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "wrong.html", gin.H{
 			"error":  err.Error(),
@@ -100,7 +100,6 @@ func (h *Handler) Result(c *gin.Context) {
 	}
 
 	device, err := spotifyClient.ActiveDevice(ctx)
-
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
 			"error":  err.Error(),
@@ -116,7 +115,6 @@ func (h *Handler) Result(c *gin.Context) {
 		track.ID,
 		string(device.ID),
 	)
-
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "wrong.html", gin.H{
 			"error":  err.Error(),

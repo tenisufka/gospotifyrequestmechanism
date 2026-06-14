@@ -26,5 +26,10 @@ func (s *TokenStore) Get() *oauth2.Token {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	return s.token
+	if s.token == nil {
+		return nil
+	}
+
+	tokenCopy := *s.token
+	return &tokenCopy
 }

@@ -8,15 +8,8 @@ require (
 )
 
 require (
-	github.com/gin-contrib/sessions v1.1.0
 	github.com/zmb3/spotify/v2 v2.4.3
 	golang.org/x/oauth2 v0.36.0
-)
-
-require (
-	github.com/gorilla/context v1.1.2 // indirect
-	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gorilla/sessions v1.4.0 // indirect
 )
 
 require (

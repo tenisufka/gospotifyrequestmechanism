@@ -7,7 +7,6 @@ import (
 )
 
 func (h *Handler) Callback(c *gin.Context) {
-
 	code := c.Query("code")
 
 	if code == "" {
@@ -32,6 +31,7 @@ func (h *Handler) Callback(c *gin.Context) {
 		return
 	}
 
+	// zapis tokenu hosta
 	h.tokenStore.Set(token)
 
 	c.Redirect(
