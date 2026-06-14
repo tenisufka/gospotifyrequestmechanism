@@ -7,7 +7,7 @@ Aplikacja stanowi koncepcję systemu umożliwiającego uczniom zgłaszanie utwor
 Projekt został stworzony przez grupę uczniów Technikum Mechaniczno-Elektrycznego im. Nikoli Tesli w Chorzowie i ma charakter edukacyjny oraz demonstracyjny.
 
 > [!NOTE]
-> Projekt nie jest wykorzystywany przez Technikum Mechaniczno-Elektryczne im. Nikoli Tesli w Chorzowie ani z nim oficjalnie powiązany. Stanowi niezależną inicjatywę uczniowską prezentującą możliwe rozwiązanie organizacyjne i techniczne dla szkolnego radiowęzła.
+> Projekt nie jest wykorzystywany przez Technikum Mechaniczno-Elektryczne im. Nikoli Tesli w Chorzowie ani z nim oficjalnie powiązany. 
 
 > [!IMPORTANT]
 > Jest to projekt stworzony w Polsce 🇵🇱.
