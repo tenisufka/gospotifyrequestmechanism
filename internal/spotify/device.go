@@ -7,7 +7,7 @@ import (
 	zspotify "github.com/zmb3/spotify/v2"
 )
 
-var ErrNoActiveDevice = errors.New("no active spotify device")
+var ErrNoDevice = errors.New("no active spotify device")
 
 func (c *Client) ActiveDevice(
 	ctx context.Context,
@@ -30,5 +30,5 @@ func (c *Client) ActiveDevice(
 		return &devices[0], nil
 	}
 
-	return nil, ErrNoActiveDevice
+	return nil, ErrNoDevice
 }
