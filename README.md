@@ -1,13 +1,11 @@
 # GoSpotify Request Mechanism
 
-Implementacja w języku Go oryginalnego projektu **Spotify Request Mechanism**.
+Aplikacja stanowi koncepcję systemu umożliwiającego uczniom zgłaszanie utworów do kolejki Spotify, a następnie automatyczne moderowanie zgłoszeń przed dodaniem ich do odtwarzania. Projekt został opracowany jako propozycja usprawnienia procesu zarządzania muzyką w szkolnym radiowęźle oraz automatyzacji obsługi zgłoszeń utworów.
 
-Aplikacja umożliwia uczniom zgłaszanie utworów do kolejki Spotify, a następnie automatycznie moderuje zgłoszenia przed dodaniem ich do odtwarzania. Projekt powstał w celu zautomatyzowania działania szkolnego radiowęzła, a dokładniej procesu dodawania piosenek przez uczniów.
-
-Projekt został stworzony przez grupę uczniów Technikum Mechaniczno-Elektrycznego im. Nikoli Tesli w Chorzowie.
+Projekt został stworzony przez grupę uczniów Technikum Mechaniczno-Elektrycznego im. Nikoli Tesli w Chorzowie i ma charakter edukacyjny oraz demonstracyjny.
 
 > [!NOTE]
-> Aplikacja w żaden sposób nie jest powiązana z Technikum Mechaniczno-Elektrycznym im. Nikoli Tesli w Chorzowie ani jego marką. Jest to niezależny projekt stworzony przez uczniów szkoły.
+> Projekt nie jest wykorzystywany przez Technikum Mechaniczno-Elektryczne im. Nikoli Tesli w Chorzowie ani z nim oficjalnie powiązany. Stanowi niezależną inicjatywę uczniowską prezentującą możliwe rozwiązanie organizacyjne i techniczne dla szkolnego radiowęzła.
 
 > [!IMPORTANT]
 > Jest to projekt stworzony w Polsce 🇵🇱.
