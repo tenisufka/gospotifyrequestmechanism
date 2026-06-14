@@ -58,6 +58,12 @@ go run ./cmd/server
 
 ## Autorzy
 
+### GoSpotify Request Mechanism
+
+**Alan Nicpoń**  
+Go Developer  
+Discord: `69jk`
+
 ### Spotify Request Mechanism
 
 **Michał Christ**  
@@ -70,9 +76,3 @@ Discord: `lisu5367`
 
 **Łukasz Winkler**  
 Web Developer
-
-### GoSpotify Request Mechanism
-
-**Alan Nicpoń**  
-Go Developer  
-Discord: `69jk`
