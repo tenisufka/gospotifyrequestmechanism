@@ -30,6 +30,9 @@ func main() {
 	// -----------------------------
 	router.Static("/static", "./static")
 
+	// Obsługa favicon.ico
+	router.StaticFile("/favicon.ico", "./static/favicon.ico")
+
 	// -----------------------------
 	// HTML TEMPLATES
 	// -----------------------------
