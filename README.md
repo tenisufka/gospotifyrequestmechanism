@@ -1,5 +1,7 @@
 # GoSpotify Request Mechanism
 
+Implementacja projektu Spotify Request Mechanism.
+
 Aplikacja stanowi koncepcję systemu umożliwiającego uczniom zgłaszanie utworów do kolejki Spotify, a następnie automatyczne moderowanie zgłoszeń przed dodaniem ich do odtwarzania. Projekt został opracowany jako propozycja usprawnienia procesu zarządzania muzyką w szkolnym radiowęźle oraz automatyzacji obsługi zgłoszeń utworów.
 
 Projekt został stworzony przez grupę uczniów Technikum Mechaniczno-Elektrycznego im. Nikoli Tesli w Chorzowie i ma charakter edukacyjny oraz demonstracyjny.
