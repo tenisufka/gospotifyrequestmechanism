@@ -8,12 +8,9 @@ import (
 
 func (h *Handler) Index(c *gin.Context) {
 
-	ctx := c.Request.Context()
+	client := h.spotifyClient()
 
-	current, err := h.spotify.CurrentlyPlaying(ctx)
-
-	if err != nil || current == nil {
-
+	if client == nil {
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"title":          "Spotify Request Mechanism",
 			"PlaybackName":   "",
@@ -21,18 +18,28 @@ func (h *Handler) Index(c *gin.Context) {
 			"PlaybackImage":  "",
 			"PlaybackEx":     false,
 		})
+		return
+	}
 
+	current, err := client.CurrentlyPlaying(c.Request.Context())
+
+	if err != nil || current == nil {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"title":          "Spotify Request Mechanism",
+			"PlaybackName":   "",
+			"PlaybackArtist": "",
+			"PlaybackImage":  "",
+			"PlaybackEx":     false,
+		})
 		return
 	}
 
 	image := ""
-
 	if len(current.Album.Images) > 0 {
 		image = current.Album.Images[0].URL
 	}
 
 	artist := ""
-
 	if len(current.Artists) > 0 {
 		artist = current.Artists[0].Name
 	}

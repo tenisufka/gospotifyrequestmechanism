@@ -11,6 +11,7 @@ func (c *Client) CurrentlyPlaying(
 ) (*zspotify.FullTrack, error) {
 
 	player, err := c.Client.PlayerCurrentlyPlaying(ctx)
+
 	if err != nil {
 		return nil, err
 	}
