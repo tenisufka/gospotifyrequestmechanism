@@ -1,15 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-    <title>Error</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Request Mechanism</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/bdcb6a0802.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
 
-<h1>Error</h1>
+{{if .track}}
+<div class="container">
 
-<p>{{ .error }}</p>
+    <div class="song-container">
 
-<a href="/">Back</a>
+        {{if .image}}
+        <img src="{{.image}}" alt="Album Cover">
+        {{end}}
+
+        <div class="bottom-box">
+            <div class="title-container">
+                <h2>{{.track}}</h2>
+                <p>{{.artist}}</p>
+            </div>
+
+            <i class="fa-solid fa-xmark fa-beat"></i>
+        </div>
+
+    </div>
+
+    <div class="comment-container">
+        <p>{{.error}}</p>
+    </div>
+
+    <div class="button-box">
+        <div class="button-back" onclick="window.history.back()">
+            Cofnij
+        </div>
+    </div>
+
+</div>
+
+{{else}}
+
+<div class="container">
+
+    <div class="comment-container">
+        <p>{{.error}}</p>
+    </div>
+
+    <div class="button-box">
+        <div class="button-back" onclick="window.location.href='/'">
+            Powrót
+        </div>
+    </div>
+
+</div>
+
+{{end}}
+
+<script>
+setTimeout(function () {
+    window.location.href = "/";
+}, 10000);
+</script>
+
+<script>
+var canvas = document.createElement("canvas");
+var width = canvas.width = window.innerWidth * 0.75;
+var height = canvas.height = window.innerHeight * 0.75;
+
+document.body.appendChild(canvas);
+
+var gl = canvas.getContext("webgl");
+
+if (!gl) {
+    console.error("WebGL not supported");
+}
+</script>
 
 </body>
 </html>

@@ -14,23 +14,21 @@ func (h *Handler) Result(c *gin.Context) {
 
 	if song == "" {
 		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
-			"error": "song is empty",
+			"error": "Nie podano utworu",
 		})
 		return
 	}
 
 	ctx := c.Request.Context()
 
-	// Inicjalizacja i sprawdzenie klienta Spotify dla hosta
 	spotifyClient := h.spotifyClient()
 	if spotifyClient == nil {
 		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
-			"error": "host is not logged into spotify",
+			"error": "Host nie jest zalogowany do Spotify",
 		})
 		return
 	}
 
-	// Wyszukanie utworu za pomocą pobranego klienta
 	track, err := spotifyClient.SearchTrack(
 		ctx,
 		song,
@@ -43,9 +41,22 @@ func (h *Handler) Result(c *gin.Context) {
 		return
 	}
 
+	imageURL := ""
+	if len(track.Album.Images) > 0 {
+		imageURL = track.Album.Images[0].URL
+	}
+
+	artist := "Unknown Artist"
+	if len(track.Artists) > 0 {
+		artist = track.Artists[0].Name
+	}
+
 	if track.Explicit {
 		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
-			"error": "explicit track",
+			"error":  "Utwór oznaczony jako Explicit",
+			"track":  track.Name,
+			"artist": artist,
+			"image":  imageURL,
 		})
 		return
 	}
@@ -54,19 +65,13 @@ func (h *Handler) Result(c *gin.Context) {
 
 	if durationSeconds > 300 {
 		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
-			"error": "track longer than 5 minutes",
+			"error":  "Utwór jest dłuższy niż 5 minut",
+			"track":  track.Name,
+			"artist": artist,
+			"image":  imageURL,
 		})
 		return
 	}
-
-	if len(track.Artists) == 0 {
-		c.HTML(http.StatusInternalServerError, "wrong.html", gin.H{
-			"error": "track has no artists",
-		})
-		return
-	}
-
-	artist := track.Artists[0].Name
 
 	lyricsText, err := h.lyrics.GetLyrics(
 		ctx,
@@ -76,29 +81,36 @@ func (h *Handler) Result(c *gin.Context) {
 
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "wrong.html", gin.H{
-			"error": err.Error(),
+			"error":  err.Error(),
+			"track":  track.Name,
+			"artist": artist,
+			"image":  imageURL,
 		})
 		return
 	}
 
 	if filters.ContainsBadWords(lyricsText) {
 		c.HTML(http.StatusForbidden, "wrong.html", gin.H{
-			"error": "lyrics contain forbidden words",
+			"error":  "Tekst zawiera niedozwolone słowa",
+			"track":  track.Name,
+			"artist": artist,
+			"image":  imageURL,
 		})
 		return
 	}
 
-	// Pobranie aktywnego urządzenia za pomocą pobranego klienta
 	device, err := spotifyClient.ActiveDevice(ctx)
 
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "wrong.html", gin.H{
-			"error": err.Error(),
+			"error":  err.Error(),
+			"track":  track.Name,
+			"artist": artist,
+			"image":  imageURL,
 		})
 		return
 	}
 
-	// Dodanie do kolejki za pomocą pobranego klienta
 	err = spotifyClient.AddToQueue(
 		ctx,
 		track.ID,
@@ -107,13 +119,18 @@ func (h *Handler) Result(c *gin.Context) {
 
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "wrong.html", gin.H{
-			"error": err.Error(),
+			"error":  err.Error(),
+			"track":  track.Name,
+			"artist": artist,
+			"image":  imageURL,
 		})
 		return
 	}
 
 	c.HTML(http.StatusOK, "result.html", gin.H{
 		"track":  track.Name,
+		"artist": artist,
+		"image":  imageURL,
 		"lyrics": lyricsText,
 	})
 }
