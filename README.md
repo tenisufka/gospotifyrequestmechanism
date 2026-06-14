@@ -50,12 +50,11 @@ SPOTIFY_SECRET=your_client_secret
 REDIRECT_URL=http://localhost:8080/callback
 SESSION_SECRET=change_me
 
-## 🏃 Uruchomienie
-
 Aby uruchomić aplikację lokalnie, wykonaj poniższe polecenie w terminalu:
 
-```bash
+bash
 go run ./cmd/server
+```
 
 ## Autorzy
 
